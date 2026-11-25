@@ -5,7 +5,30 @@
 {% block content %}
 <div class="schedule_wrap">
     <h2 class="page_title">Занятия</h2>
+    <div class="filter_bar">
+        <div class="filter_group">
+            <label class="filter_label">Направление</label>
+            <select class="filter_select">
+                <option>Все направления</option>
+                {% for workout in workouts %}
+                <option>{{ workout.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
+        <div class="filter_group">
+            <label class="filter_label">Тренеры</label>
+            <select class="filter_select">
+                <option>Любые</option>
+                <option>Тренер тренеров</option>
+                <option>60 минут</option>
+                <option>90 минут</option>
+            </select>
+        </div>
+
+
+        <button type="button" class="btn_primary filter_btn">Применить</button>
+    </div>
     <div class="workouts_grid">
         {% for workout in workouts %}
         <div class="workout_card">
@@ -23,8 +46,10 @@
                 {% for slot in workout.active_slots %}
                 <div class="slot_row">
                     <div class="workout_meta">
-                        <span><strong>{{ slot.get_day_of_week_display }}, {{ slot.start_time|time:"H:i" }}</strong> ({{slot.get_next_date|date:"d.m" }})</span>
-                        <span>Тренер: {{ slot.trainer.full_name }} • Мест: {{ slot.available_seats }}/{{slot.max_capacity }}</span>
+                        <span><strong>{{ slot.get_day_of_week_display }}, {{ slot.start_time|time:"H:i" }}</strong>
+                            ({{slot.get_next_date|date:"d.m" }})</span>
+                        <span>Тренер: {{ slot.trainer.full_name }} • Мест: {{ slot.available_seats
+                            }}/{{slot.max_capacity }}</span>
                     </div>
 
                     {% if user.is_authenticated %}

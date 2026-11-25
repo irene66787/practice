@@ -9,6 +9,20 @@ class RegistrationForm(UserCreationForm):
   class Meta:
     model = User
     fields = ('full_name', 'email', 'phone', 'price')
+    widgets = {
+        'phone': forms.TextInput(
+            attrs={
+                'type': 'tel',
+                'placeholder': '+7 (900) 000-00-00',
+                'pattern': (
+                    r'^(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$'
+                ),
+                'title': (
+                    'Введите номер в формате +7 (900) 123-45-67 или 89001234567'
+                ),
+            }
+        ),
+      }
 
   def save(self, commit=True):
     user = super().save(commit=False)

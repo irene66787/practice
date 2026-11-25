@@ -763,6 +763,56 @@ button:hover {
         width: 100%;
     }
 }
+.filter_bar {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.filter_group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.filter_label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7a828e;
+    text-transform: uppercase;
+}
+
+.filter_select {
+    background-color: #EEF3FA;
+    border: none;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #1f2937;
+    outline: none;
+}
+
+.filter_btn {
+    width: auto;
+    padding: 12px 24px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .filter_group,
+    .filter_btn {
+        width: 100%;
+    }
+}
 
 @media (max-width: 480px) {
     .logo {
