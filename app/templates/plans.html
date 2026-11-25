@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Абонементы{% endblock %}
+
+{% block content %}
+<div class="schedule_wrap">
+    <h2 class="page_title">Абонементы</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert_msg">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="workouts_grid">
+        {% for plan in plans %}
+            <div class="workout_card">
+                <div>
+                    <div class="workout_day">{{ plan.get_kind_display }} • {{ plan.duration_days }} дн.</div>
+                    <h3 class="workout_title">{{ plan.name }}</h3>
+
+                    <div class="plan_details">
+                        <p>
+                            {% if plan.kind == 'package' %}
+                                Занятий в пакете: <strong>{{ plan.workouts_count }}</strong>
+                            {% else %}
+                                Посещение: <strong>Безлимит</strong>
+                            {% endif %}
+                        </p>
+                        <p>
+                            Заморозка:
+                            {% if plan.freeze_days_limit > 0 %}
+                                <strong>до {{ plan.freeze_days_limit }} дн.</strong>
+                            {% else %}
+                                <span>не предусмотрена</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="workout_footer">
+                    <div class="plan_price">{{ plan.price }} ₽</div>
+
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'client' %}
+                            <form action="{% url 'buy_subscription' plan.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn_primary">Оформить</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}" class="link_login">Войти для покупки</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p class="text_muted">Пока нет доступных тарифов.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

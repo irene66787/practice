@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Авторизация{% endblock %}
+
+{% block content %}
+<div class="form_center">
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        <h2>Авторизация</h2>
+
+        <div class="auth_inputs">
+            {{form.as_p}}
+        </div>
+        <a href="{% url 'register' %}">Нет аккаунта?</a>
+        <button type="submit">Войти</button>
+    </form>
+</div>
+{% endblock %}

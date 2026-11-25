@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Тренеры{% endblock %}
+
+{% block content %}
+<div class="schedule_wrap">
+    <h2 class="page_title">Наши тренеры</h2>
+
+    <div class="workouts_grid">
+        {% for trainer in trainers %}
+            <div class="workout_card">
+                <div>
+                    {% if trainer.photo %}
+                        <img src="{{ trainer.photo.url }}" alt="{{ trainer.full_name }}" class="trainer_photo">
+                    {% else %}
+                        <div class="trainer_placeholder">{{ trainer.full_name|slice:":1" }}</div>
+                    {% endif %}
+
+                    <h3 class="workout_title">{{ trainer.full_name }}</h3>
+                    {% if trainer.bio %}
+                        <p class="workout_desc">{{ trainer.bio }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="workout_footer">
+                    <span class="text_muted">Тел.: {{ trainer.phone }}</span>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text_muted">Список тренеров пока пуст.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

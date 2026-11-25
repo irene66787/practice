@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Авторизация{% endblock %}
+
+{% block content %}
+<div class="content_block">
+
+    {% if messages %}
+    <div class="profile_messages">
+        {% for message in messages %}
+        <div class="message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="cabinet">
+        <div class="cabinet_card profile-card">
+            <h3>Личные данные</h3>
+            <div class="info_list">
+                <div>
+                    <span class="info_label">ФИО</span>
+                    <span>{{ user.full_name }}</span>
+                </div>
+                <div>
+                    <span class="info_label">Email</span>
+                    <span>{{ user.email }}</span>
+                </div>
+                <div>
+                    <span class="info_label">Телефон</span>
+                    <span>{{ user.phone }}</span>
+                </div>
+                <div>
+                    <span class="info_label">Роль</span>
+                    <span>{{ user.get_role_display }}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if user.role == 'client' %}
+        <div class="cabinet_main">
+            <div class="cabinet_card">
+                <div class="card_header">
+                    <h3>Мой абонемент</h3>
+                    {% if active_sub %}
+                    <span>{{ active_sub.get_status_display }}</span>
+                    {% endif %}
+                </div>
+
+                {% if active_sub %}
+                <div class="sub_info">
+                    <p class="sub_title">{{ active_sub.plan.name }} — <span>{{ active_sub.plan.get_kind_display}}</span>
+                    </p>
+
+                    <div class="sub_stats">
+                        <div class="stat_item">
+                            <span class="stat_name">Срок действия</span>
+                            <span class="stat_value">{{ active_sub.start_date }} — {{ active_sub.end_date }}</span>
+                        </div>
+
+                        {% if active_sub.plan.kind == 'package' %}
+                        <div class="stat_item">
+                            <span class="stat_name">Осталось занятий</span>
+                            <span class="stat_value">{{ active_sub.remaining_workouts }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="stat_item">
+                            <span class="stat_name">Дней заморозки</span>
+                            <span class="stat_value">{{ active_sub.remaining_freeze_days }}</span>
+                        </div>
+                    </div>
+
+                    {% if active_sub.status == 'active' and freeze_form %}
+                    <form action="{% url 'freeze_subscription' active_sub.id %}" method="post" class="sub_form">
+                        {% csrf_token %}
+                        <div class="form_fields">
+                            {{ freeze_form.as_p }}
+                        </div>
+                        <button type="submit">Заморозить абонемент</button>
+                    </form>
+                    {% elif active_sub.status == 'frozen' %}
+                    <form action="{% url 'unfreeze_subscription' active_sub.id %}" method="post" class="sub_form">
+                        {% csrf_token %}
+                        <button type="submit">Разморозить досрочно</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p>У вас пока нет активного абонемента.</p>
+                    <a href="{% url 'plans' %}">Выбрать абонемент</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="cabinet_card">
+                <h3>Мои предстоящие записи</h3>
+
+                {% if upcoming_bookings %}
+                <ul class="booking_list">
+                    {% for booking in upcoming_bookings %}
+                    <li class="booking_item">
+                        <div class="booking_info">
+                            <strong class="booking_name">{{ booking.schedule.workout_type.name }}</strong>
+                            <span class="booking_date">
+                                {{ booking.schedule.start_time|date:"d.m.Y в H:i" }} Тренер:
+                                {{ booking.schedule.trainer.full_name }}
+                            </span>
+                        </div>
+
+                        <form action="{% url 'cancel_booking' booking.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit">Отменить</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty_box">
+                    <p>У вас нет активных записей на занятия.</p>
+                    <a href="{% url 'schedule' %}">Перейти в расписание</a>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if history_subs %}
+            <div class="cabinet_card">
+                <h3>История абонементов</h3>
+                <ul class="history_list">
+                    {% for sub in history_subs %}
+                    <li class="history_item">
+                        <div>
+                            <strong>{{ sub.plan.name }}</strong>
+                            <span class="history_date">({{ sub.start_date }} — {{ sub.end_date }})</span>
+                        </div>
+                        <span class="history_status">{{ sub.get_status_display }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if past_bookings %}
+            <div class="cabinet_card">
+                <h3>История посещений</h3>
+                <ul class="history-list">
+                    {% for booking in past_bookings %}
+                    <li class="history-item">
+                        <div>
+                            <strong>{{ booking.schedule.workout_type.name }}</strong>
+                            <span class="history-dates">
+                                ({{ booking.workout_date|date:"d.m.Y" }} в {{ booking.schedule.start_time|time:"H:i" }},
+                                тренер: {{ booking.schedule.trainer.full_name }})
+                            </span>
+                        </div>
+                        <span class="badge badge-neutral">{{ booking.get_status_display }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

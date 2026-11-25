@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Тренеры{% endblock %}
+
+{% block content %}
+<div class="schedule_wrap">
+    <h2 class="page_title">Занятия</h2>
+
+    <div class="workouts_grid">
+        {% for workout in workouts %}
+        <div class="workout_card">
+            <div>
+                <div class="workout_day">{{ workout.duration_minutes }} мин</div>
+                <h3 class="workout_title">{{ workout.name }}</h3>
+                {% if workout.description %}
+                <p class="workout_desc">{{ workout.description }}</p>
+                {% endif %}
+            </div>
+
+            <div class="workout_slots">
+                {% if workout.active_slots %}
+                <div class="slots_label">Ближайшие занятия:</div>
+                {% for slot in workout.active_slots %}
+                <div class="slot_row">
+                    <div class="workout_meta">
+                        <span><strong>{{ slot.get_day_of_week_display }}, {{ slot.start_time|time:"H:i" }}</strong> ({{slot.get_next_date|date:"d.m" }})</span>
+                        <span>Тренер: {{ slot.trainer.full_name }} • Мест: {{ slot.available_seats }}/{{slot.max_capacity }}</span>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                    {% if user.role == 'client' %}
+                    {% if slot.id in user_active_schedule_ids %}
+                    <span class="status_booked">Вы записаны</span>
+                    {% elif slot.available_seats > 0 %}
+                    <form action="{% url 'book_workout' slot.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn_primary">Записаться</button>
+                    </form>
+                    {% else %}
+                    <span class="text_muted">Мест нет</span>
+                    {% endif %}
+                    {% endif %}
+                    {% else %}
+                    <a href="{% url 'login' %}" class="link_login">Войти</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text_muted" style="margin: 0;">Свободных слотов в расписании пока нет</p>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="text_muted">Направления занятий пока не добавлены.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

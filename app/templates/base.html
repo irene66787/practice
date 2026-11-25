@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Главная{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <span class="logo">
+                FITNESS
+            </span>
+            <nav class="header_nav">
+                <a href="{% url 'home' %}">Главная</a>
+                <a href="{% url 'trainers' %}">Тренеры</a>
+                <a href="{% url 'plans' %}">Тарифы</a>
+                <a href="{% url 'workouts' %}">Занятия</a>
+                <a href="{% url 'schedule' %}">Расписание</a>
+
+                {% if user.is_authenticated %}
+                    {% if user.role == 'client' %}
+                    <a href="{% url 'profile' %}">Профиль</a>
+                    {% endif%}
+
+                    {% if user.role == 'trainer' %}
+                        <a href="{% url 'trainer_dashboard' %}">Панель тренера</a>
+                    {% endif %}
+
+                    {% if user.role == 'admin' or user.is_superuser %}
+                        <a href="{% url 'admin:index' %}">Админка</a>
+                    {% endif %}
+
+                <form id="loginout" action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Выйти</button>
+                </form>
+                {% else %}
+                    <a href="{% url 'login' %}">Войти</a>
+                    <a href="{% url 'register' %}">Зарегистрироваться</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <a href="{% url 'home' %}" class="logo">FITNESS</a>
+
+            <nav class="footer_nav">
+                <a href="{% url 'home' %}">Главная</a>
+                <a href="#">Тренеры</a>
+                <a href="#">Занятия</a>
+                <a href="#">Расписание</a>
+            </nav>
+
+            <span>Все права защищены &copy2026 </span>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/slider.js'%}"></script>
+</body>
+
+</html>

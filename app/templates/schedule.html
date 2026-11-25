@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Расписание{% endblock %}
+
+{% block content %}
+<div class="schedule_wrap">
+    <h2 class="page_title">Расписание занятий</h2>
+
+    <div class="schedule_card">
+        <table class="schedule_table">
+            <thead>
+                <tr>
+                    <th>День недели</th>
+                    <th>Время</th>
+                    <th>Занятие</th>
+                    <th>Тренер</th>
+                    <th>Места</th>
+                    <th>Запись</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day in days_schedule %}
+                {% if day.items %}
+                {% for item in day.items %}
+                <tr>
+                    <td><strong>{{ day.day_name }}</strong></td>
+                    <td>{{ item.start_time|time:"H:i" }} <span class="text_muted">({{ item.workout_type.duration_minutes}} мин)</span></td>
+                    <td>{{ item.workout_type.name }}</td>
+                    <td>{{ item.trainer.full_name }}</td>
+                    <td>{{ item.available_seats }} / {{ item.max_capacity }}</td>
+                    <td>
+                        {% if user.is_authenticated %}
+                        {% if user.role == 'client' %}
+                        {% if item.id in user_booked_ids %}
+                        <span class="status_booked">Вы записаны ({{ item.get_next_date|date:"d.m" }})</span>
+                        {% elif item.available_seats > 0 %}
+                        <form action="{% url 'book_workout' item.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn_primary">Записаться ({{ item.get_next_date|date:"d.m"}})</button>
+                        </form>
+                        {% else %}
+                        <span class="text_muted">Мест нет</span>
+                        {% endif %}
+                        {% else %}
+                        <span class="text_muted">—</span>
+                        {% endif %}
+                        {% else %}
+                        <a href="{% url 'login' %}" class="link_login">Войти</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td><strong>{{ day.day_name }}</strong></td>
+                    <td colspan="5" class="text_muted">Занятий нет</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
